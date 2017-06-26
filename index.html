@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wunderlist → Trello</title>
+		<style type="text/css">
+			.completed {
+				opacity: 0.5;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript">
+			window.WTT={};
+			WTT.getTrello=function(key){
+				return $.getScript("https://api.trello.com/1/client.js?key="+key,function(script, status){
+					return WTT.auth();
+				})
+			}
+		</script>
+		<script type="text/javascript" src="wtt.js"></script>
+		<!--  -->
+		<form action="" onsubmit="javascript:WTT.getTrello($('#api-key').val());return false;">
+			<input type="text" name="" placeholder="API_KEY" id="api-key" value="">
+			<button type="submit">Auth me</button>
+		</form>
+
+
+		<textarea id="wunderlist-json">
+			
+		</textarea>
+
+		<form action="#" onsubmit="javascript:WTT.export();return false;">
+			<label>Board <input type="text" id="board-id" name="board-id" value=""></label>
+			<!-- <label>Include completed tasks <input type="checkbox" name="include-completed" checked=""></label> -->
+			<div>
+				<button type="submit">Export</button >
+			</div>
+		</form>
+
+		<ul id="wunderlist-lists" onmousedown="javascript:WTT.toggleTasks()"></ul>
+	</body>
+</html>
