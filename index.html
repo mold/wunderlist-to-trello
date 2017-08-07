@@ -10,14 +10,6 @@
 	</head>
 	<body>
 		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript">
-			window.WTT={};
-			WTT.getTrello=function(key){
-				return $.getScript("https://api.trello.com/1/client.js?key="+key,function(script, status){
-					return WTT.auth();
-				})
-			}
-		</script>
 		<script type="text/javascript" src="wtt.js"></script>
 		<!--  -->
 		<form action="" onsubmit="javascript:WTT.getTrello($('#api-key').val());return false;">
@@ -26,13 +18,11 @@
 		</form>
 
 
-		<textarea id="wunderlist-json">
-			
-		</textarea>
+		<textarea id="wunderlist-json" placeholder="PASTE YOUR WUNDERLIST JSON HERE" onchange="javascript:WTT.parseJSON();"></textarea>
 
 		<form action="#" onsubmit="javascript:WTT.export();return false;">
-			<label>Board <input type="text" id="board-id" name="board-id" value=""></label>
-			<!-- <label>Include completed tasks <input type="checkbox" name="include-completed" checked=""></label> -->
+			<p><label>Board <input type="text" id="board-id" name="board-id" value=""></label></p>
+			<p><label>Include completed tasks <input type="checkbox" name="include-completed" checked=""></label></p>
 			<div>
 				<button type="submit">Export</button >
 			</div>
