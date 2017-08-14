@@ -6,6 +6,22 @@
 			.completed {
 				opacity: 0.5;
 			}
+
+			.info{
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				border: 1px solid;
+				padding: 20px;
+				box-shadow: 2px 2px 0px 0px #bbb, 0 0 200px 200px white;
+				display:none;
+				background: white;
+			}
+
+			.info__task{
+				font-weight: bold;
+			}
 		</style>
 	</head>
 	<body>
@@ -29,5 +45,9 @@
 		</form>
 
 		<ul id="wunderlist-lists" onmousedown="javascript:WTT.toggleTasks()"></ul>
+
+		<div class="info">
+			<p>Added task <span class="info__task"></span></p>
+		</div>
 	</body>
 </html>

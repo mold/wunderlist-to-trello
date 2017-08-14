@@ -2,7 +2,13 @@ window.WTT = {};
 (function(WTT) {
 	// console.log(WTT);
 
-	var lists;
+	var lists,
+		_totalTasks = {
+			completed: 0,
+			all: 0
+		},
+		_savedTasks = 0,
+		_includeCompleted;
 
 	WTT.getTrello = function(key) {
 		return $.getScript("https://api.trello.com/1/client.js?key=" + key, function(script, status) {
@@ -40,8 +46,9 @@ window.WTT = {};
 			return;
 		}
 
-		var idBoard = $("#board-id").val(),
-			includeCompleted = $("[name=include-completed]")[0].checked;
+		var idBoard = $("#board-id").val();
+		_includeCompleted = $("[name=include-completed]")[0].checked;
+		_savedTasks = 0;
 
 		// get "real" idBoard
 		Trello.get("/boards/" + idBoard).then(function(data) {
@@ -62,7 +69,7 @@ window.WTT = {};
 							task;
 
 
-						if (t.completed && !includeCompleted) {
+						if (t.completed && !_includeCompleted) {
 							return;
 						}
 
@@ -94,7 +101,15 @@ window.WTT = {};
 	function _postTask(task, count) {
 		var count = parseInt("0" + count);
 		Trello.post("/cards/", task, function success() {
-			// create checklist for subtasks here
+			_savedTasks++;
+			var total = _includeCompleted ? _totalTasks.all : _totalTasks.all - _totalTasks.completed;
+
+			$(".info").show();
+			if (_savedTasks === total) {
+				$(".info").html("<h1>ALL DONE</h1>");
+			} else {
+				$(".info").html('<p>Added task <span class="info__task">' + task.name + '</span></p>');
+			}
 		}, function error(resp) {
 			if (resp.status !== 429 || count > 3) {
 				// error is not rate limit exceeded, so stop
@@ -128,6 +143,10 @@ window.WTT = {};
 
 		var lists_o = {}; // lists "indexed" by id
 		var lists_a = []; // lists as array
+		_totalTasks = {
+			completed: 0,
+			all: 0
+		};
 
 		obj.data.lists.forEach(function(l) {
 			l.tasks = {};
@@ -147,6 +166,8 @@ window.WTT = {};
 			t.title = t.completed ? "✔ " + t.title : t.title;
 
 			lists_a[lists_o[t.list_id].index].tasks.push(t);
+			if (t.completed) _totalTasks.completed++;
+			_totalTasks.all++;
 		});
 
 		obj.data.subtasks.forEach(function(st) {
