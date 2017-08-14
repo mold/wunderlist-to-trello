@@ -57,19 +57,30 @@ window.WTT = {};
 					newLists.push(data.id);
 
 					l.tasks.forEach((function(t, ti) {
-						var data = this;
+						var data = this,
+							desc = "",
+							task;
+
 
 						if (t.completed && !includeCompleted) {
-							console.log("skip task: ", t)
 							return;
 						}
 
-						// max 10 requests per s
-						window.setTimeout(_postTask.bind(null, {
+						if (t.completed) {
+							desc += "_This task has already been \"Completed\" in Wunderlist_\n\n";
+						}
+
+						desc += "https://www.wunderlist.com/#/tasks/" + t.id;
+
+
+						task = {
 							name: t.title,
 							idList: data.id,
-							desc: "https://www.wunderlist.com/#/tasks/" + t.id,
-						}), li * ti * 100);
+							desc: desc,
+						};
+
+						// max 10 requests per s
+						window.setTimeout(_postTask.bind(null, task), li * ti * 100);
 					}).bind(data));
 				}).bind(l), function(resp) {
 					alert("Trello API error: ");
@@ -82,7 +93,6 @@ window.WTT = {};
 
 	function _postTask(task, count) {
 		var count = parseInt("0" + count);
-		console.log("try numbeR: ", count);
 		Trello.post("/cards/", task, function success() {
 			// create checklist for subtasks here
 		}, function error(resp) {
@@ -134,11 +144,13 @@ window.WTT = {};
 			t.subtasks = [];
 			lists_o[t.list_id].tasks[t.id] = t;
 			tasks[t.id] = t;
+			t.title = t.completed ? "✔ " + t.title : t.title;
 
 			lists_a[lists_o[t.list_id].index].tasks.push(t);
 		});
 
 		obj.data.subtasks.forEach(function(st) {
+			st.title = st.completed ? "✔ " + st.title : st.title;
 			tasks[st.task_id].subtasks.push(st);
 		})
 
@@ -150,7 +162,7 @@ window.WTT = {};
 
 			l.tasks.forEach(function(t) {
 				var t_li = $("<li>")
-					.text((t.completed ? "✔ " : "") + t.title)
+					.text(t.title)
 					.addClass("task outer-task" + (t.completed ? " completed" : ""));
 				ul.append(t_li);
 
@@ -158,7 +170,7 @@ window.WTT = {};
 					var st_ul = $("<ul>").appendTo(t_li);
 					t.subtasks.forEach(function(st) {
 						$("<li>")
-							.text((st.completed ? "✔ " : "") + st.title)
+							.text(st.title)
 							.addClass("task subtask" + (st.completed ? " completed" : ""))
 							.appendTo(st_ul);
 					})
