@@ -55,6 +55,7 @@ window.WTT = {};
 			idBoard = data.id;
 
 			var newLists = [];
+			var timeOutCounter = 0;
 			lists.forEach(function(l, li) {
 				Trello.post("/lists/", {
 					name: l.title,
@@ -85,10 +86,11 @@ window.WTT = {};
 							idList: data.id,
 							desc: desc,
 						};
-
-						// max 10 requests per s
-						window.setTimeout(_postTask.bind(null, task), li * ti * 100);
+						timeOutCounter += 1000; //Add 1s between each task API request
+						window.setTimeout(_postTask.bind(null, task), timeOutCounter);
 					}).bind(data));
+					// Optionally log the value of Timeout Counter so users can know how long the import will take
+					// console.log("Timeout Counter is: " + timeOutCounter); 
 				}).bind(l), function(resp) {
 					alert("Trello API error: ");
 				});
